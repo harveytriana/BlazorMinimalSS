@@ -1,0 +1,8 @@
+body{
+    margin:25px;
+}
+
+:focus{
+    border:none;
+    outline:none;
+}
