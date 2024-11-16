@@ -13,23 +13,22 @@
     </div>
 </div>
 
-@code{
+@code {
     readonly float _width = 400, _height = 400;
 
     string Style => $"width:{_width}px;height:{_height}px;";
-
-    const float R = 0.5F;
 
     void PaintSurface(SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.White);
 
-        using SKPaint penMesh = new() {
-            Color = SKColors.LightGray,
-            IsAntialias = false,
-            Style = SKPaintStyle.Stroke,
-        };
+        using SKPaint penMesh = new()
+            {
+                Color = SKColors.LightGray,
+                IsAntialias = false,
+                Style = SKPaintStyle.Stroke,
+            };
 
         float w = e.Info.Width;
         float h = e.Info.Height;
@@ -39,18 +38,15 @@
         {
             canvas.DrawLine(x, 0, x, h, penMesh);
         }
-        // perfect close
-        canvas.DrawLine(w - R, 0, w - R, h, penMesh);
+        // close line
+        canvas.DrawLine(w - 1, 0, w - 1, h, penMesh);
         // y
         float my = h / 20.0F;
         for (float y = 0; y < h; y += my)
         {
             canvas.DrawLine(0, y, w, y, penMesh);
         }
-        // perfect close
-        canvas.DrawLine(0, h - R, w, h - R, penMesh);
+        // close lone
+        canvas.DrawLine(0, h - 1, w, h - 1, penMesh);
     }
-
-
-
 }
