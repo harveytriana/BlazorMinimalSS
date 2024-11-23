@@ -14,11 +14,11 @@
     </tr>
     <tr>
         <td>Time</td>
-        <td>@sensorTime</td>
+        <td>@SensorTimeLabel</td>
     </tr>
     <tr>
         <td>Current Value</td>
-        <td>@sensorValue</td>
+        <td>@SensorValueLabel</td>
     </tr>
 </table>
 
@@ -30,9 +30,9 @@
     const string TF = "yyyy-MM-dd HH:mm:ss.fff",
                  NF = "0.000000";
 
-    string sensorSender = "Tempeature Gradient";
-    string sensorTime = "0000-00-dd 00:00:00.000";
-    string sensorValue = "0.000000";
+    string sensorSender = "Tempeature Gradient, fahrenheit";
+    DateTime sensorTime;
+    float sensorValue;
     string status = string.Empty;
 
     readonly float _width = 400, _height = 200;
@@ -41,7 +41,10 @@
 
     Timer timer = new Timer();
     double interval = 1000;
-    Random random = new();
+    AuthomatedLog authomatedLog = new AuthomatedLog(30, 60);
+
+    string SensorTimeLabel => sensorTime == default ? "000-00-00 00:00:00.000" : sensorTime.ToString(TF);
+    string SensorValueLabel => sensorValue.ToString(NF);
 
     protected override void OnInitialized()
     {
@@ -52,9 +55,9 @@
 
     async Task DoSignal()
     {
-        sensorTime = DateTime.Now.ToString(TF);
-        sensorValue = random.NextDouble().ToString(NF);
-        await InvokeAsync(StateHasChanged); 
+        sensorTime = DateTime.Now;
+        sensorValue = authomatedLog.NextValue();
+        await InvokeAsync(StateHasChanged);
     }
 
     void PaintSurface(SKPaintSurfaceEventArgs e)
