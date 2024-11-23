@@ -1,0 +1,97 @@
+﻿@page "/"
+@using SkiaSharp
+@using SkiaSharp.Views.Blazor
+@using System.Timers
+@implements IDisposable
+
+<PageTitle>Home</PageTitle>
+
+<h1>Sensor Monitor</h1>
+<hr />
+<table>
+    <tr>
+        <td colspan="2" class="title">@sensorSender</td>
+    </tr>
+    <tr>
+        <td>Time</td>
+        <td>@sensorTime</td>
+    </tr>
+    <tr>
+        <td>Current Value</td>
+        <td>@sensorValue</td>
+    </tr>
+</table>
+
+<div>
+    <SKCanvasView OnPaintSurface="PaintSurface" IgnorePixelScaling=true style="@Style" />
+</div>
+
+@code {
+    const string TF = "yyyy-MM-dd HH:mm:ss.fff",
+                 NF = "0.000000";
+
+    string sensorSender = "Tempeature Gradient";
+    string sensorTime = "0000-00-dd 00:00:00.000";
+    string sensorValue = "0.000000";
+    string status = string.Empty;
+
+    readonly float _width = 400, _height = 200;
+
+    string Style => $"width:{_width}px;height:{_height}px;";
+
+    Timer timer = new Timer();
+    double interval = 1000;
+    Random random = new();
+
+    protected override void OnInitialized()
+    {
+        timer.Interval = interval;
+        timer.Elapsed += (s, e) => InvokeAsync(DoSignal);
+        timer.Start();
+    }
+
+    async Task DoSignal()
+    {
+        sensorTime = DateTime.Now.ToString(TF);
+        sensorValue = random.NextDouble().ToString(NF);
+        await InvokeAsync(StateHasChanged); 
+    }
+
+    void PaintSurface(SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.White);
+
+        using SKPaint penMesh = new()
+            {
+                Color = SKColors.LightGray,
+                IsAntialias = false,
+                Style = SKPaintStyle.Stroke,
+            };
+
+        float w = e.Info.Width;
+        float h = e.Info.Height;
+        // x
+        float mx = w / 20.0F;
+        for (float x = 0; x < w; x += mx)
+        {
+            canvas.DrawLine(x, 0, x, h, penMesh);
+        }
+        // close line
+        canvas.DrawLine(w - 1, 0, w - 1, h, penMesh);
+        // y
+        float my = h / 10.0F;
+        for (float y = 0; y < h; y += my)
+        {
+            canvas.DrawLine(0, y, w, y, penMesh);
+        }
+        // close lone
+        canvas.DrawLine(0, h - 1, w, h - 1, penMesh);
+    }
+
+    public void Dispose()
+    {
+        timer.Stop();
+        timer.Dispose();
+    }
+}
